@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: spring-boot-environment-variables-demo
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+        - env
+
+mls:
+  config:
+    feature-flags:
+      abgaenge: false
+      rtme-2101-audit-logs: true
+      rtme-1470-multi-edit: "345678"
+      TEST_FLAG: false

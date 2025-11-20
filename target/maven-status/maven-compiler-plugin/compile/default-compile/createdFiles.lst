@@ -1,0 +1,6 @@
+META-INF/spring-configuration-metadata.json
+com/example/spring/environment/variables/demo/EnvLogger.class
+com/example/spring/environment/variables/demo/MyConfig.class
+com/example/spring/environment/variables/demo/SpringEnvironmentVariablesDemoApplication.class
+com/example/spring/environment/variables/demo/MyConfig$FeatureFlags.class
+com/example/spring/environment/variables/demo/MyController.class
