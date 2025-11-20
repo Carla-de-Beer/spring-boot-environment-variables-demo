@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "mls.config")
+@ConfigurationProperties(prefix = "xyz.config")
 public class MyConfig {
 
     private FeatureFlags featureFlags;
@@ -19,17 +19,17 @@ public class MyConfig {
 
     public static class FeatureFlags {
 
-        private boolean abgaenge;
+        private boolean myProperty;
         private boolean rtme2101AuditLogs;
         private String rtme1470MultiEdit;
         private boolean testFlag;
 
-        public boolean isAbgaenge() {
-            return abgaenge;
+        public boolean isMyProperty() {
+            return myProperty;
         }
 
-        public void setAbgaenge(boolean abgaenge) {
-            this.abgaenge = abgaenge;
+        public void setMyProperty(boolean myProperty) {
+            this.myProperty = myProperty;
         }
 
         public boolean isRtme2101AuditLogs() {

@@ -1,20 +1,15 @@
-FROM eclipse-temurin:21-jre-alpine AS builder
+FROM eclipse-temurin:21-jre-jammy AS builder
 ARG JAR_FILE=target/*.jar
 COPY ${JAR_FILE} application.jar
 
-ARG PROFILE
-
-ENV MLS_CONFIG_FEATURE_FLAGS_RTME_1470_MULTI_EDIT=FOO
-
 RUN java -Djarmode=layertools -jar application.jar extract
 
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-jammy
 
-# CVE-2023-5363 workaround, until an updated Alpine image has been made available
-RUN apk upgrade --update-cache --available && \
-    apk add openssl && \
-    rm -rf /var/cache/apk/* && \
-    addgroup --system javauser && adduser -S -s /bin/false -G javauser javauser
+#ENV XYZ_CONFIG_FEATUREFLAGS_RTME1470MULTIEDIT=FOO
+
+RUN groupadd --system javauser && \
+    useradd --system --no-create-home --gid javauser --shell /usr/sbin/nologin javauser
 USER javauser
 
 COPY --from=builder --chown=javauser:javauser dependencies/ ./

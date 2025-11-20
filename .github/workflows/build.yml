@@ -1,0 +1,116 @@
+name: 'CI | Java Maven build'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [ $default-branch ]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/spring-boot-environment-variables-demo:latest
+
+jobs:
+  build:
+    name: Build project and Docker image
+    runs-on: ubuntu-24.04
+
+    permissions:
+      contents: read
+      checks: write
+      security-events: write
+
+    steps:
+
+      - name: Checkout code from repository ${{ github.repository }}
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build the application with Maven
+        run: mvn --batch-mode --update-snapshots clean package spring-boot:repackage -DskipTests
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: false
+          load: true
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Run container in background
+        run: |
+          docker run -d --name springboot-demo -p 8080:8080 -e XYZ_CONFIG_FEATUREFLAGS_RTME1470MULTIEDIT='GitHub Actions' ${{ env.IMAGE }}
+          
+          for i in {1..30}; do
+            if STATUS=$(curl -s http://localhost:8080/actuator/health | jq -r .status 2>/dev/null) && [ "$STATUS" = "UP" ]; then
+              echo "Application is healthy!"
+              exit 0
+            fi
+            echo "Waiting for app to be healthy... ($i/30)"
+            sleep 2
+          done
+          echo "Application failed to become healthy within 60 seconds"
+          docker logs springboot-demo
+          exit 1
+
+      - name: Test API endpoint
+        run: |
+          curl -v -X GET http://localhost:8080/api/hello/multi-edit
+
+      - name: Stop and remove container
+        if: always()
+        run: |
+          docker stop springboot-demo || true
+          docker rm springboot-demo || true
+
+      - name: Run Trivy CVE scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.IMAGE }}
+          exit-code: 0
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'HIGH,CRITICAL'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && github.event_name != 'pull_request' && hashFiles('trivy-results.sarif') != ''
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Push to Docker Hub
+        if: github.event_name != 'pull_request' && github.ref_name == 'main'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha
+          platforms: linux/amd64
+

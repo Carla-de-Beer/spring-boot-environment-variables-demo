@@ -1,4 +1,4 @@
-## Spring Environment Variables Demo
+## Spring Boot Environment Variables Demo
 
 This is a simple demo project to illustrate how environment variables are used and consumed within a Spring Boot project, with reference to the container within which it runs.
 
@@ -19,7 +19,7 @@ docker build -f docker/Dockerfile -t carla-demo-app .
 3. Run the Docker container:
 
 ```sh
-docker container run --rm -p 8080:8080 -e MLS_CONFIG_FEATUREFLAGS_RTME1470MULTIEDIT=CARLA carla-demo-app
+docker container run --rm -p 8080:8080 -e XYZ_CONFIG_FEATUREFLAGS_RTME1470MULTIEDIT=CARLA carla-demo-app
 ```
 
 4. Call the API:

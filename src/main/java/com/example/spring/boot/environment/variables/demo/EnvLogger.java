@@ -1,10 +1,14 @@
 package com.example.spring.boot.environment.variables.demo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EnvLogger implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(EnvLogger.class);
 
     private MyConfig myConfig;
 
@@ -14,11 +18,11 @@ public class EnvLogger implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        System.out.println("=== ENV VARIABLES ===");
-        System.getenv().forEach((k, v) -> System.out.println(k + "=" + v));
+        logger.info("--- ENV VARIABLES ---");
+        System.getenv().forEach((k, v) -> logger.info("{}={}", k, v));
 
-        System.out.println("isRtme2101AuditLogs: " + myConfig.getFeatureFlags().isRtme2101AuditLogs());
-        System.out.println("isAbgaenge: " + myConfig.getFeatureFlags().isAbgaenge());
-        System.out.println("getRtme1470MultiEdit: " + myConfig.getFeatureFlags().getRtme1470MultiEdit());
+        logger.info("isRtme2101AuditLogs: {}", myConfig.getFeatureFlags().isRtme2101AuditLogs());
+        logger.info("myProperty: {}", myConfig.getFeatureFlags().isMyProperty());
+        logger.info("getRtme1470MultiEdit: {}", myConfig.getFeatureFlags().getRtme1470MultiEdit());
     }
 }
