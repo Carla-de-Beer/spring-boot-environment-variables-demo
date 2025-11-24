@@ -62,7 +62,11 @@ jobs:
 
       - name: Run container in background
         run: |
-          docker run -d --name springboot-demo -p 8080:8080 -e XYZ_CONFIG_FEATUREFLAGS_RTME1470MULTIEDIT='GitHub Actions' ${{ env.IMAGE }}
+          docker run -d --name springboot-demo \
+            -p 8080:8080 \
+            -e XYZ_CONFIG_FEATUREFLAGS_RTME1470MULTIEDIT=CARLA \
+            -e XYZ_CONFIG_FEATUREFLAGS_RTME2618ABGAENGE=CARLA \
+            ${{ env.IMAGE }}
           
           for i in {1..30}; do
             if STATUS=$(curl -s http://localhost:8080/actuator/health | jq -r .status 2>/dev/null) && [ "$STATUS" = "UP" ]; then
@@ -78,7 +82,7 @@ jobs:
 
       - name: Test API endpoint
         run: |
-          curl -v -X GET http://localhost:8080/api/hello/multi-edit
+          curl -v -X GET http://localhost:8080/api/demo/display-feature-flags
 
       - name: Stop and remove container
         if: always()

@@ -20,16 +20,17 @@ public class MyConfig {
     public static class FeatureFlags {
 
         private boolean myProperty;
+        private String rtme2618Abgaenge;
         private boolean rtme2101AuditLogs;
         private String rtme1470MultiEdit;
         private boolean testFlag;
 
-        public boolean isMyProperty() {
-            return myProperty;
+        public String getRtme2618Abgaenge() {
+            return rtme2618Abgaenge;
         }
 
-        public void setMyProperty(boolean myProperty) {
-            this.myProperty = myProperty;
+        public void setRtme2618Abgaenge(String rtme2618Abgaenge) {
+            this.rtme2618Abgaenge = rtme2618Abgaenge;
         }
 
         public boolean isRtme2101AuditLogs() {
@@ -54,6 +55,14 @@ public class MyConfig {
 
         public void setTestFlag(boolean testFlag) {
             this.testFlag = testFlag;
+        }
+
+        public boolean isMyProperty() {
+            return myProperty;
+        }
+
+        public void setMyProperty(boolean myProperty) {
+            this.myProperty = myProperty;
         }
     }
 
